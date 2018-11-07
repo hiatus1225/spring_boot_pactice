@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+create table board (
+	bseq number primary key,
+	title varchar2(100),
+	contents varchar2(500),
+	userid varchar2(100),
+	regdate date default sysdate,
+	filePath varchar2(100),
+	fileName varchar2(100)	
+);
+create sequence board_seq
+start with 1 increment by 1;
+
+create table board_reply (
+rseq number primary key,
+reply varchar2(100),
+bseq number,
+userid varchar2(20),
+regdate date default sysdate
+);
+
+create sequence board_reply_seq
+start with 1 
+increment by 1;
+
+
+insert into board(bseq ,title,contents,userid,regdate)
+values(board_seq.nextval, '제목1','내용','lee',sysdate);	
+
+insert into board_reply(rseq, reply, bseq, userid)
+values(board_reply_seq.nextval, 'dddd', 1, 'lee');
+
+commit;
+-->
+
+
+<!-- <mapper namespace="boardNameSpace"> -->
+<mapper namespace="com.biz.mapper.BoardMapper">
+	<resultMap id="myBoardMap" type="com.biz.vo.BoardVO">
+		<id property="bseq" column="bseq" />
+		<result property="title" column="title"/>
+		<result property="contents" column="contents" />
+		<result property="userid" column="userid" />
+		<result property="regdate" column="regdate" />
+		<result property="ufilePath" column="ufile_path" />
+		<result property="ufileName" column="ufile_name" />
+		<result property="ufileSize" column="ufile_size" />
+		<result property="ufileSysName" column="ufile_sys_name" />
+		<collection property="boardReplyVOList" resultMap="myBoardReplyMap" />  <!--columnPrefix="r_" -->
+	</resultMap>
+	
+	<resultMap id="myBoardReplyMap" type="com.biz.vo.BoardReplyVO">
+		<id property="rseq" column="rseq" />
+		<result property="bseq" column="bseq" />
+		<result property="reply" column="reply" />
+		<result property="userid" column="userid" />
+		<result property="regdate" column="regdate" />
+	</resultMap>
+	
+	
+	<select id="brlist" resultMap="myBoardMap">
+		select b.bseq, b.title,b.userid,
+			to_char(b.regdate, 'YYYY-MM-DD') as regdate,
+		 	r.rseq, r.reply
+		from board b, board_reply r
+		where b.bseq=r.bseq
+	</select>
+	
+	<select id="selectAll" resultMap="myBoardMap">
+		select bseq,title,contents,userid, to_char(regdate, 'YYYY-MM-DD') as regdate, ufile_size, ufile_path, ufile_name, ufile_sys_name 
+		from board 
+		order by bseq desc
+	</select>
+
+	<select id="view" parameterType="int" resultMap="myBoardMap">
+		select * from board where bseq=#{bseq}
+	</select>
+	
+	<insert id="insert" 
+	useGeneratedKeys="true"
+    keyProperty="bseq"
+	parameterType="com.biz.vo.BoardVO" > <!-- parameterType="com.biz.vo.BoardVO" -->
+		<selectKey keyProperty="bseq" resultType="int" 
+		order="AFTER">     
+	 		select board_seq.currval as bseq from dual
+	 	</selectKey>
+	 	insert into board
+		(bseq,title,contents,userid,ufile_size,ufile_path
+		,ufile_name,ufile_sys_name) 
+		values(board_seq.nextval,#{title},#{contents},#{userid},#{ufileSize}
+		,#{ufilePath},#{ufileName},#{ufileSysName})
+	</insert>  
+	
+	<update id="update" parameterType="com.biz.vo.BoardVO">
+		update board 
+		set title=#{title}, contents=#{contents} 
+		where bseq=#{bseq}
+	</update>
+	
+	<delete id="delete" parameterType="com.biz.vo.BoardVO">
+		delete from board where bseq=#{bseq}
+	</delete>
+	
+	
+	<!-- 댓글  -->
+	<select id="rselect" parameterType="int" resultType="com.biz.vo.BoardReplyVO"> <!-- bseq -->
+		select rseq, reply, userid, regdate, bseq 
+		from board_reply 
+		where bseq=#{bseq} 
+		order by rseq asc
+	</select>
+	
+	<insert id="rinsert" parameterType="com.biz.vo.BoardReplyVO">
+		insert into board_reply(rseq,reply,userid,bseq) 
+		values(board_reply_seq.nextval,#{reply},#{userid},#{bseq})
+	</insert>
+	
+	<delete id="rdelete" parameterType="int">  <!-- rseq -->
+		delete from board_reply where rseq=#{rseq}
+	</delete>
+	
+	<!-- <![CDATA[ > ]]> -->
+	
+</mapper>	

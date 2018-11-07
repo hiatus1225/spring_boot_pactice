@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- <mapper namespace="userNameSpace"> -->
+<mapper namespace="com.biz.mapper.UserMapper">
+	<!-- <resultMap id="userMap" type="com.biz.vo.UserVO">
+		<id property="seq" column="seq" />
+		<result property="id" column="id" />
+		<result property="pw" column="pw" />
+		<result property="name" column="name" />
+	</resultMap> -->
+	
+ 	<sql id="commonSelect">seq, id, pw, name</sql>
+ 	
+ 	<select id="getUser" parameterType="com.biz.vo.UserVO"
+ 						resultType="com.biz.vo.UserVO">
+ 		select name 
+ 		from mvcuser 
+ 		where id=#{id} and pw=#{pw} <!--  jdbcType=VARCHAR -->
+ 	</select>
+	
+	<!-- <select id="allUser" resultType="com.biz.vo.UserVO">
+		select  *
+		from member
+	</select>
+	<insert id="insertUser" parameterType="com.biz.vo.UserVO">
+		insert into member
+		values(member_seq.nextval, #{id},#{pw},#{name},'u',sysdate)
+	</insert>  -->
+	
+</mapper>	

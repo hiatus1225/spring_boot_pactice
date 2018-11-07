@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- <mapper namespace="userNameSpace"> -->
+<mapper namespace="com.biz.mapper.CartMapper">
+	 <resultMap id="cartMap" type="com.biz.vo.CartVO">
+		<id property="cseq" column="cseq" />
+		<result property="gcode" column="gcode" />
+		<result property="regid" column="regid" />
+		<result property="regdate" column="regdate" />
+		<result property="amount" column="amount" />
+		<collection property="goodsList" resultMap="goodsMap" /> <!-- columnPrefix="g_"  -->
+	</resultMap>
+	
+	<resultMap id="categoriMap" type="com.biz.vo.CategoriVO">
+		<id property="cateCode" column="cate_code" />
+		<result property="cateName" column="cate_name" />
+		<!-- <collection property="goodsList"></collection> -->
+	</resultMap>
+	
+	<resultMap id="goodsMap" type="com.biz.vo.GoodsVO">
+		<id property="gcode" column="gcode" />
+		<result property="cateCode" column="cate_code" />
+		<result property="gname" column="gname" />
+		<result property="gprice" column="gprice" />
+		<result property="regid" column="regid" />
+		<result property="regdate" column="regdate" />
+		<association property="categori" resultMap="categoriMap" />
+		<collection property="goodsImgVOs" resultMap="goodsImgMap"/>
+	</resultMap> 
+	
+	<resultMap id="goodsImgMap" type="com.biz.vo.GoodsImgVO">
+		<id property="iseq" column="iseq" />
+		<result property="gcode" column="gcode" />
+		<result property="imgPath" column="img_path" />
+		<result property="imgName" column="img_name" />
+		<!-- <collection property="categori"></collection> -->
+	</resultMap>
+	
+	
+ 	<!-- <sql id="commonSelect">seq, id, pw, name</sql> -->
+ 	
+ 	<select id="selectAll" parameterType="String" resultMap="cartMap">
+ 		select c.cseq, c.gcode, c.amount, g.gname, g.gprice, t.cate_name, i.img_path, i.img_name
+		from cart c, goods g, categori t,goods_img i 
+		where c.regid=#{value} 
+		and c.gcode=g.gcode 
+		and g.cate_code = t.cate_code 
+		and g.gcode=i.gcode
+ 	</select>
+ 	
+ 	<!-- @param multiParameter parameterType XX -->
+ 	<select id="select" resultMap="cartMap">
+ 		select c.cseq, c.gcode, c.amount, g.gname, g.gprice, t.cate_name, i.img_path, i.img_name
+		from cart c, goods g, categori t,goods_img i 
+		where c.regid=#{regid} 
+		and c.cseq = #{cseq}
+		and c.gcode=g.gcode 
+		and g.cate_code = t.cate_code 
+		and g.gcode=i.gcode 
+		
+ 	</select>
+ 	
+	
+	<!-- <select id="allUser" resultType="com.biz.vo.UserVO">
+		select  *
+		from member
+	</select>
+	<insert id="insertUser" parameterType="com.biz.vo.UserVO">
+		insert into member
+		values(member_seq.nextval, #{id},#{pw},#{name},'u',sysdate)
+	</insert>  -->
+	
+</mapper>	
