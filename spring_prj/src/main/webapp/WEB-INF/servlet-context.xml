@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<context:component-scan base-package="com.kosmo.**" />
+	<context:component-scan base-package="com.biz.**" />
+	<mvc:annotation-driven />
+	
+	<context:property-placeholder location="classpath:*.properties"/>
+	
+	<!-- MultipartResolver setting 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="100000000" />
+    </bean>
+	-->
+
+	<!-- <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" /> 
+	 -->
+	 
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	
+
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:resources mapping="/img/**" location="/img/" />
+	<mvc:resources mapping="/c/**" location="c:/uploads/" />
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    	<property name="maxUploadSize" value="100000000"/>
+	</bean>
+	
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<bean id="handlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+	
+	
+	<!-- multicationController는 메소드명이 곧 주소가 됨 -->
+	<bean name="/abs" class="com.kosmo.url.AbsController"> </bean>
+	<bean name="/insert" class="com.kosmo.url.MultiController"> </bean>
+	<bean name="/select" class="com.kosmo.url.MultiController"> </bean>
+	
+	
+
+ 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${driver}"></property>
+        <property name="url" value="${url}"></property>
+        <property name="username" value="${userId}"></property>
+        <property name="password" value="${userPassword}"></property>
+    </bean>
+    
+	<!-- mybatis FactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="mapperLocations" value="classpath*:*-map.xml" /> -->
+		<property name="configLocation" value="classpath:config-mybatis.xml" />
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+		<property name="basePackage" value="com.biz.mapper" /> 
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean> 
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- <bean name="/login" class="com.biz.user.LoginController">
+			<constructor-arg ref="userServiceImpl" />
+			<constructor-arg ref="userVO" />
+			<constructor-arg value="C:/uploard" />
+			<property name="userServiceSetter" ref="userServiceImpl" />
+			<property name="userVOSetter" ref="userVO" />
+	</bean>
+	<bean name="/logout" class="com.biz.user.LogoutController">
+		
+	</bean> -->
+	
+	
+	<!-- <bean name="logincontroller" class="com.biz.user.LoginController">
+			<constructor-arg>
+				<ref bean="userserviceimpl" />
+			</constructor-arg>
+	</bean>  -->
+	
+	
+	<!--VO는 프로토타입으로 해야 함,요청시에마다 새 인스턴스생성  -->
+	
+	<!-- <bean scope="prototype" name="userVO" class="com.biz.user.UserVO" />
+	<bean name="userServiceImpl" class="com.biz.user.UserServiceImpl">
+		<constructor-arg ref="userDAO" />
+	</bean>
+	
+	<bean name="userDAO" class = "com.biz.user.UserDAO" >
+		<constructor-arg ref="dbManager" />
+	</bean> -->
+	<!-- <bean name="dbManager" class="com.biz.user.DBManager">
+	</bean> -->
+
+	<!--  AOP  -->
+	<!-- <bean name="commonAspectBean" class="com.biz.common.CommonAspect"></bean> -->
+	<!-- <bean name="LoggingAspectBean" class="com.biz.common.LoggingAspect"></bean> -->
+	
+	
+	<!-- <aop:config> 	AOP Config 
+		<aop:aspect id="commonAspectID" ref="commonAspectBean"> name 사용금지
+			<aop:pointcut expression="execution(public * com.biz..*ServiceImpl.*(..))" id="pointcutID"/>
+			<aop:before pointcut-ref="pointcutID" method="beforeMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="afterMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="logging"/>
+		</aop:aspect> -->
+		
+		
+		<!-- <aop:aspect id="LoggingAspectID" ref="LoggingAspectBean"> name 사용금지
+			<aop:pointcut expression="execution(public * com.biz..*ServiceImpl.*(..))" id="pointcutID"/>
+			<aop:before pointcut-ref="pointcutID" method="beforeMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="afterMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="logging"/>
+		</aop:aspect> -->
+		
+	<!-- </aop:config> -->
+	
+	<!-- <aop:aspectj-autoproxy /> proxy wakeUP
+	<aop:config> 	AOP Config 
+		<aop:aspect id="LoggingAspectID" ref="LoggingAspectBean"> name 사용금지
+			<aop:pointcut expression="execution(public * com.biz..*ServiceImpl.*(..))" id="pointcutID"/>
+			<aop:before pointcut-ref="pointcutID" method="beforeMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="afterMethod"/>
+			<aop:after pointcut-ref="pointcutID" method="logging"/>
+		</aop:aspect>
+	</aop:config> -->
+	
+	<!--   Transaction
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+		<property name="dataSource" ref="dataSource" /> 
+	</bean>  -->
+	
+	
+		<!-- @Transactional  -->
+	<aop:aspectj-autoproxy />
+	<tx:annotation-driven transaction-manager="txManager" />
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="*" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut id="txPointcut" expression="execution(public * com.biz..*Impl.*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>  
+	
+	
+	<!-- 
+	<bean id="userDao" class="org.mybatis.spring.sample.dao.UserDaoImpl"> 
+		<property name="sqlSession" ref="sqlSession" /> 
+	</bean> 
+	-->
+	 
+<!-- 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+		<property name="basePackage" value="org.mybatis.spring.sample.mapper" /> 
+	</bean> 	 -->
+<!-- 	<bean id="userMapper" class="org.mybatis.spring.sample.mapper.BImpl"> 
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+	</bean> --> 
+	
+</beans>

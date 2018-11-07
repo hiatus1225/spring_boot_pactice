@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>	
+	<!--  db.properties 
+	<properties resource="oracle.properties" />
+	 -->
+	
+	<!-- ******마이바티스 고유*************  -->
+	<!--  null --> 
+	<settings>
+        <setting name="cacheEnabled" value="false" />
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+	
+	<!-- TypeAliases -->  
+	<typeAliases>
+		<typeAlias alias="userVO" type="com.biz.user.UserVO"  />
+		<typeAlias alias="bvo" type="com.biz.board.BoardVO"  />
+		<typeAlias alias="rvo" type="com.biz.board.BoardReplyVO"  />
+	</typeAliases>
+	
+<!-- *****************************************************  -->
+
+
+	 <!-- DBCP 
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${userId}" />
+				<property name="password" value="${userPassword}" />
+			</dataSource>
+		</environment>
+	</environments>
+	 -->
+	
+	<!-- mapper 
+	<mappers>
+		<mapper resource="user-map.xml" />
+		<mapper resource="board-map.xml" />	
+	</mappers>
+	-->
+
+</configuration>
